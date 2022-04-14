@@ -1,3 +1,5 @@
+**Attribution:** This dApp and its accompanying "litepaper" were created by Marcos (Marcus) A. B. His GitHub username is codesport
+
 # Key Takeaway and Lesson Learned: Unit Tests are Your Friend
 
 The key takeaway from this project is that, at a minimum, thorough unit tests must be performed (and pass) on all functions that handle and compute money.  
