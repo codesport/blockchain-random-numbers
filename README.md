@@ -1,4 +1,4 @@
-**Attribution:** This dApp and its accompanying "litepaper" were created by Marcos (Marcus) A. B. His GitHub username is codesport
+**Attribution:** This dApp was created by Marcos (Marcus) A. B. His GitHub username is [codesport](https://github.com/codesport)
 
 # Key Takeaway and Lesson Learned: Unit Tests are Your Friend
 
@@ -12,7 +12,7 @@ Finally, console logging function outputs and test assertions are critical to ga
 
 # Overview and Navigation
 
-* [Technical Deep Dive: Randomness on Blockchains](#randomness-on-blockchains-ethereum-virtual-machine-deployment)
+* [Technical Deep Dive: Randomness on Blockchains](#technical-deep-dive-randomness-on-evm-compatible-blockchains)
 * [Technical Details: In-house, Pseudo-Random Number Generator](#technical-details-in-house-pseudo-random-number-generator)
 * [Unit Testing](#unit-testing)
 * [Proactive Contract Exploit Blocking: Off-Chain Auditing, NoEOAs, and Usage Throttling By IP and Wallet Addresses](#proactive-contract-exploit-blocking-off-chain-auditing-noeoas-and-usage-throttling-by-ip-and-wallet-addresses)
@@ -20,23 +20,19 @@ Finally, console logging function outputs and test assertions are critical to ga
 * [References](#references)
 
 
-This repo showcases a proof of concept, in-house a random number generator.  It has been integrated in a Raffle/Lotto game and deployed to Ethereum's Rinkeby & Meter's Warringstakes testnets.  
+This repo showcases a proof of concept, in-house a random number generator.  It has been integrated in a Raffle/Lotto game and deployed to Ethereum's Rinkeby, Polygon's Mumbai, and Meter's Warringstakes testnets.  
 
 The winner receives the amount of the token wagered plus the entire jackpot balance!
 
-Given my INFOSEC background, I found this exercise quite fun, but extremely challenging. Fun, in finding ways to exploit the contract! And then coding in countermeasures.  It was also extremely challenging and difficult given paucity of clear and up-to-date resources on Solidity contract development. 
-
-The deployed contract address is located [here](https://scan-warringstakes.meter.io/address/0xC76E1C32cE3eed1aBCd24323636378ee85b59643). And, the Solidity code is [here in the repo](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol).
+Given my INFOSEC background, I found this exercise quite fun, but extremely challenging. Fun, in finding ways to exploit the contract! And then coding in countermeasures.  However, it was also extremely challenging and difficult given the paucity of clear and up-to-date resources on Solidity contract development. 
 
 
-## Next Steps
-
-My immediate goal is to host this app on a live server and then deploy to mainnet after additional testing!
+![Blockchain Raffle Machine: UI MVP](https://github.com/codesport/blockchain-random-numbers/blob/master/frontend/src/images/app-dashboard.png "MVP UI for Blockchain Raffle Machine")
 
 
-## Technical Deep Dive: Randomness on Blockchains (Ethereum Virtual Machine Deployment)
+# Technical Deep Dive: Randomness on EVM Compatible Blockchains
 
-Blockchains are immutable and deterministic. Hence, producing on-chain randomness is a non-trivial problem.  A working Proof-Of-Concept (POC) random number generator was evaluated with 3 possible implementations: 
+Blockchains are immutable and deterministic. Hence, producing on-chain randomness is a non-trivial problem.  For this projects, a working Proof-Of-Concept (POC) random number generator was evaluated with 3 possible implementations: 
 
  1.  Harmony offers an [on-chain VRF](https://docs.harmony.one/home/developers/tools/harmony-vrf). It is based on the value of an arbitrary and unknown future block. Owing to time constraints, Harmony's VRF was not used in this project. 
  
@@ -214,7 +210,7 @@ Lines 443 - 453 show that only admins can access sensitive tracking data.
 
 [Externally Owned Accounts and Contracts (EOAs)](https://ethereum.stackexchange.com/questions/93082/how-do-eoas-work-and-what-is-their-interaction-with-smart-contracts) are blocked from interacting with the game. The `function modifier` on [lines 124 - 125](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L124) enforces this rule when applied to any public and external functions.
 
-### 3. Usage Throttling
+### 3. Usage Throttling By IP and Wallet Address
 
 [Usage throttling](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L101) is implemented to  restrict hammering by the same  wallet and IP addresses. Although not bulletproof due to VPNs and the ease of generating multiple wallet address, these measures do make it more challenging for an attacker to exploit the contract.
 
@@ -250,10 +246,11 @@ Next steps include:
 * Blocking popular VPNs and/or certain nation-states
 * Professional contract audit
 
-The smart contract deployment and activity is available on the following networks:
+The smart contract deployment and activity are available on the following networks:
 
-* Ethereum's Rinkeby Testnet: [0x7952418216f7ff1cae90E2ab18B66221157aE4cA](https://rinkeby.etherscan.io/address/0x7952418216f7ff1cae90E2ab18B66221157aE4cA)
-* Meter's Warringstakes Testnet: [0xC76E1C32cE3eed1aBCd24323636378ee85b59643](https://scan-warringstakes.meter.io/address/0xC76E1C32cE3eed1aBCd24323636378ee85b59643)
+* **Ethereum's Rinkeby Testnet:** [0x7952418216f7ff1cae90E2ab18B66221157aE4cA](https://rinkeby.etherscan.io/address/0x7952418216f7ff1cae90E2ab18B66221157aE4cA)
+* **Polygon Mumbai:** [0x6D72EB7761dF2ED53789EC9ea3AEEf179Ee1494C](https://mumbai.polygonscan.com/address/0x6D72EB7761dF2ED53789EC9ea3AEEf179Ee1494C)
+*** Meter's Warringstakes Testnet:** [0xC76E1C32cE3eed1aBCd24323636378ee85b59643](https://scan-warringstakes.meter.io/address/0xC76E1C32cE3eed1aBCd24323636378ee85b59643)
 
 
 ## References:

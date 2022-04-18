@@ -15,8 +15,6 @@ const Controller = () => {
     const { ethereum } = window
     const [currentAccount, setCurrentAccount] = useState("");
 
-    //console.log("Admin 1 address: "+ admin1 + " Admin 2 address: "+ admin2)
-
     const [status, setStatus] = useState("");
     const [error, setError] = useState("");
     const [networkNameHTML, setNetworkNameHTML] = useState("");
@@ -24,18 +22,14 @@ const Controller = () => {
     const [contractAddress, setContractAddress] = useState("")  
     const [contractNetworkName, setContractNetworkName]  = useState("")  
     // const [chainIdState, setChainId]  = useState("") 
-    // const [numberGenerator, setNumberGenerator] = useState("");
-    // const [wager, setWager] = useState("");
-    // const [guess, setGuess] = useState("");
 
-        // 
     //const contractAddress = "0xC76E1C32cE3eed1aBCd24323636378ee85b59643" 
-
 
 
 /**
      * Meter: 0xC76E1C32cE3eed1aBCd24323636378ee85b59643
      * Rinkeby: 0x7952418216f7ff1cae90E2ab18B66221157aE4cA
+     * Mumbai: 0x6D72EB7761dF2ED53789EC9ea3AEEf179Ee1494C
      * 
      * Versions to shutdown:
      *  Rinkeby: 0xEbA883FFC1d77A7Ee3B53bF779B8C5cF69711376"
@@ -43,12 +37,13 @@ const Controller = () => {
      *  Mumbai: 0xEbA883FFC1d77A7Ee3B53bF779B8C5cF69711376"
      *  Rinkeby: 0x979560129E8B90944bd5790B538C1EB97212C092
      */
-    const contractABI = abi.abi;
 
-    const provider = new ethers.providers.Web3Provider(ethereum, "any"); //@see: https://github.com/ethers-io/ethers.js/issues/899#issuecomment-646945824
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-  
+    if ( ethereum ) {
+        const contractABI = abi.abi;
+        var provider = new ethers.providers.Web3Provider(ethereum, "any"); //@see: https://github.com/ethers-io/ethers.js/issues/899#issuecomment-646945824
+        const signer = provider.getSigner();
+        var contract = new ethers.Contract(contractAddress, contractABI, signer);
+    }
 
     
 
@@ -163,7 +158,8 @@ const Controller = () => {
         }
     }
 
-    const handleGetAllUserLogs = async () => {
+    //TODO: This function is incomplete and is not used now. Will build out further when there's free time
+    const handleGetAllUserLogs = async () => { 
         try {
 
             //https://stackoverflow.com/questions/4329092/multi-dimensional-associative-arrays-in-javascript
@@ -437,10 +433,10 @@ const onContractChange_select = async (event) => {
     // sleep(5000)
     // console.log("reading Selected Contract State after 5s sleep: " + contractAddress )
 
-    console.log( array[1].toLowerCase()) //[0].toUpperCase() + array[1].substring(1)
+    console.log( 'Dapp Connected to: ' + array[1].toLowerCase()) //[0].toUpperCase() + array[1].substring(1)
 
-    console.log(simpleNetworkName.toLowerCase())
-    if (simpleNetworkName !== array[1].toLowerCase() ){
+    console.log('Wallet Connected to: ' + simpleNetworkName.toLowerCase())
+    if (simpleNetworkName.toLowerCase() != array[1].toLowerCase() ){
 
         // sleep(5000)
         //setStatus( `Running Contract ${contractAddress} on ${array[1]} `)

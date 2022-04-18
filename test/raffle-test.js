@@ -30,18 +30,47 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat")
 const axios = require("axios")
 
-const contractDepositWhenDeployed = "1" //set as global
-
-let devFee = .20 // Set as global, but make a variable, not a constant.
-
-const getExternalData = async ( url ) => {
-    const response = await axios.get(url);
-    return response.data;
- }
 
 describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of tests we are going to perform
 
+
+    //Define Globals Here
+
+    let contract //the docs don't tell you that this must be global to the tests
+
+    const contractDepositWhenDeployed = "1" //set as global
+    let devFee = .20 // Set as global, but make a variable, not a constant.
+    
+    const getExternalData = async ( url ) => {
+        const response = await axios.get(url);
+        return response.data;
+     }
+
+    const handleWinner =  async (contract, guess, wager) =>{
+
+        const winningNumber = await contract.lastWinningNumber();
+        const jackpot = ethers.utils.formatEther( await contract.jackpotPrizeAmount() )
+
+        if ( winningNumber !== guess){
+
+            return "Sorry! You picked " + guess + ", but the winning number was " + winningNumber 
+
+        } else{
+
+            const total = jackpot + wager
+
+            return "Congratulations! You picked the right winning number of " + winningNumber + ". You Won " + total 
+
+        }
+
+
+    }
+
+
+
+
     this.beforeEach(async function() {
+
         [owner, user1, user2] = await hre.ethers.getSigners(); //set as globals  
 
         //TEST 1: Contract Shall Deploy Successfully
@@ -100,13 +129,18 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
         //We hash IP Address to stop hammering
         let guess = 35
         let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-        let userDeposit = "5"
+        let wager = "5"
 
         
         //Round 1 Play
-        const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
-        // wait until the transaction is mined
+        const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
         await round1.wait()
+
+
+        console.log( await handleWinner( contract, guess, wager) )
+
+
+
 
         /*
         ContractReceipt = await round1.wait()
@@ -127,14 +161,14 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
 
         let guess = 35
         let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-        let userDeposit = "5"
+        let wager = "5"
   
         //Round 1 Play
-        const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
+        const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
         await round1.wait() // wait until the transaction is mined  
     
         //Round 2 Play With Same Wallet and Same IP
-        await expect (contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} )).to.be.revertedWith('Wallet Filter: Please wait a few minutes to play again');
+        await expect (contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} )).to.be.revertedWith('Wallet Filter: Please wait a few minutes to play again');
 
     })
 
@@ -142,14 +176,14 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
 
         let guess = 35
         let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-        let userDeposit = "5"
+        let wager = "5"
   
         //Round 1 Play
-        const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
+        const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
         await round1.wait() // wait until the transaction is mined  
     
         //Round 2 Play with New Wallet and Same IP
-        await expect (contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} )).to.be.revertedWith('IP Filter: Please wait a few minutes to play again');
+        await expect (contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} )).to.be.revertedWith('IP Filter: Please wait a few minutes to play again');
 
     })
 
@@ -161,9 +195,9 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          //Round 1: User 2 plays once
         let guess = 75
         let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-        const userDeposit1 = "10"
+        const wager1 = "10"
 
-        const round1 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit1 )} );
+        const round1 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager1 )} );
         await round1.wait()
 
         // let winingNumberTx = await contract.connect(user2).WinnerLog()
@@ -178,13 +212,13 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
 
         //Round 2: User 2 plays 2x in a row
         guess = 33
-        const userDeposit2 = "20"
+        const wager2 = "20"
 
-        const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit2 )} );
+        const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager2 )} );
         await round2.wait()
 
         //Round 3: User 1 plays once
-        const round3 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit1 )} );
+        const round3 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager1 )} );
         await round3.wait()        
 
         // View Public user logs
@@ -207,9 +241,9 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          //Round 1: User 2 plays once
         let guess = 75
         let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-        const userDeposit1 = "10"
+        const wager1 = "10"
 
-        const round1 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit1 )} );
+        const round1 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager1 )} );
         await round1.wait()
 
         // let winingNumberTx = await contract.connect(user2).WinnerLog()
@@ -224,13 +258,13 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
 
         //Round 2: User 2 plays 2x in a row
         guess = 33
-        const userDeposit2 = "20"
+        const wager2 = "20"
 
-        const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit2 )} );
+        const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager2 )} );
         await round2.wait()
 
         //Round 3: User 1 plays once
-        const round3 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit1 )} );
+        const round3 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager1 )} );
         await round3.wait()        
 
 
@@ -266,9 +300,9 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          //Round 1: User 2 plays once
         let guess = 75
         let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-        const userDeposit1 = "10"
+        const wager1 = "10"
 
-        const round1 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit1 )} );
+        const round1 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager1 )} );
         await round1.wait()
 
         // let winingNumberTx = await contract.connect(user2).WinnerLog()
@@ -283,13 +317,13 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
 
         //Round 2: User 2 plays 2x in a row
         guess = 33
-        const userDeposit2 = "20"
+        const wager2 = "20"
 
-        const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit2 )} );
+        const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager2 )} );
         await round2.wait()
 
         //Round 3: User 1 plays once
-        const round3 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit1 )} );
+        const round3 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager1 )} );
         await round3.wait()        
 
 
@@ -324,9 +358,9 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          //Round 1: User 1 plays once and seeds jackpot
          let guess = 55
          let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-         const userDeposit = "28"
+         const wager = "28"
  
-         const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
+         const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
          await round1.wait()
 
         //Guarantee winner by setting modulo to 1
@@ -339,7 +373,7 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          guess = 1
          IPAddress = ethers.utils.formatBytes32String( '192.168.133.122' )
          
-         const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
+         const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
          await round2.wait()         
 
 
@@ -363,9 +397,9 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          //Round 1: User 1 plays once and seeds jackpot
          let guess = 55
          let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-         const userDeposit = "5"
+         const wager = "5"
  
-         const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
+         const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
          await round1.wait()
 
         //Guarantee winner by setting modulo to 1
@@ -378,9 +412,9 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          guess = 1
          IPAddress = ethers.utils.formatBytes32String( '192.168.133.122' )
 
-         let expectedJackpot =  jackpotPrizeAmount  + Number(userDeposit) 
+         let expectedJackpot =  jackpotPrizeAmount  + Number(wager) 
          
-         const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
+         const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
          await round2.wait()         
 
 
@@ -393,7 +427,7 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          expect( numWins ).to.equal( 1  )
 
         //  console.log("Jackpot before user wins: " + jackpotPrizeAmount) 
-        //  console.log("userDeposit: " +  Number(userDeposit) )
+        //  console.log("wager: " +  Number(wager) )
         //  console.log("Expected Jackpot Before User Wins (jackpot + user deposit): " + expectedJackpot) 
 
          expect( +(balance).toFixed(10)  ).to.equal( +( expectedJackpot ).toFixed(10)  )
@@ -409,9 +443,9 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          //Round 1: User 1 plays once and seeds jackpot
          let guess = 55
          let IPAddress = ethers.utils.formatBytes32String( await getExternalData('https://api.ipify.org') )
-         const userDeposit = "10"
+         const wager = "10"
  
-         const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
+         const round1 = await contract.connect(user1).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
          await round1.wait()
 
         //Guarantee winner by setting modulo to 1
@@ -437,7 +471,7 @@ describe("RafflePseudo4 Smart Contract Tests", function() {//name to the set of 
          guess = 1
          IPAddress = ethers.utils.formatBytes32String( '192.168.133.122' )
          
-         const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( userDeposit )} );
+         const round2 = await contract.connect(user2).userCommit( guess, IPAddress, {value: ethers.utils.parseEther( wager )} );
          await round2.wait() 
 
 

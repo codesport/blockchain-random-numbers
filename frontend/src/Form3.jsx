@@ -61,7 +61,8 @@ import React, {useState} from 'react';
 
         const contractMeta =  [  
             {"chainId": 83, "networkName": "Meter Testnet", "contractAddress": "0xC76E1C32cE3eed1aBCd24323636378ee85b59643" },
-            {"chainId": 4, "networkName": "Rinkeby", "contractAddress": "0x7952418216f7ff1cae90E2ab18B66221157aE4cA"} 
+            {"chainId": 4, "networkName": "Rinkeby", "contractAddress": "0x7952418216f7ff1cae90E2ab18B66221157aE4cA"}, 
+            {"chainId": 80001, "networkName": "Polygon Mumbai", "contractAddress": "0x6D72EB7761dF2ED53789EC9ea3AEEf179Ee1494C"} 
         ] 
 
         // const handleContractChange = (event) =>{
