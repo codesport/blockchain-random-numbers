@@ -32,7 +32,7 @@ Given my INFOSEC background, I found this exercise quite fun, but extremely chal
 
 # Technical Deep Dive: Randomness on EVM Compatible Blockchains
 
-Blockchains are immutable and deterministic. Hence, producing on-chain randomness is a non-trivial problem.  For this projects, a working Proof-Of-Concept (POC) random number generator was evaluated with 3 possible implementations: 
+Blockchains are immutable and deterministic. Hence, producing on-chain randomness is a non-trivial problem.  For this project a working Proof-Of-Concept (POC) random number generator was evaluated with 3 possible implementations: 
 
  1.  Harmony offers an [on-chain VRF](https://docs.harmony.one/home/developers/tools/harmony-vrf). It is based on the value of an arbitrary and unknown future block. Owing to time constraints, Harmony's VRF was not used in this project. 
  
@@ -129,9 +129,9 @@ Which *should* the same as:   `jackpotPrizeAmount = address(this).balance  -  ad
 
 ## Proactive Contract Exploit Blocking: Off-Chain Auditing, NoEOAs, and Usage Throttling By IP and Wallet Addresses
 
-This contract was built from the perspective of a would be attacker hunting for exploits. Hence, the first course of business was permanent tracking of user activity while protecting user privacy. The ensuing lines of code in this section analyze this contract's security tracking schema. 
+This contract was built from the perspective of a would-be attacker hunting for exploits. Hence, the first course of business was permanent tracking of user activity while protecting user privacy. The ensuing lines of code in this section analyze this contract's security tracking schema. 
 
-a. On-chain Logging:  each user's timestamp, IP (stored as a `bytes32` type), and wallet addresses are loosely bound in three separate arrays. Becuase these arrays are updated "simultaneously"  within the same function, their indices remain the same. 
+a. On-chain Logging:  each user's timestamp, IP (stored as a `bytes32` type), and wallet addresses are loosely bound in three separate arrays. Because these arrays are updated "simultaneously"  within the same function, their indices remain the same. 
 
 b. Off-chain Analysis: The binding by index allows for the creation of an [off-chain multi-dimensional array](https://stackoverflow.com/questions/4329092/multi-dimensional-associative-arrays-in-javascript) either through a frontend JavaScript app or a more ideally backend server running PHP.  PHP can easily build and manipulate multidimensional associative arrays
 
@@ -250,7 +250,7 @@ The smart contract deployment and activity are available on the following networ
 
 * **Ethereum's Rinkeby Testnet:** [0x7952418216f7ff1cae90E2ab18B66221157aE4cA](https://rinkeby.etherscan.io/address/0x7952418216f7ff1cae90E2ab18B66221157aE4cA)
 * **Polygon Mumbai:** [0x6D72EB7761dF2ED53789EC9ea3AEEf179Ee1494C](https://mumbai.polygonscan.com/address/0x6D72EB7761dF2ED53789EC9ea3AEEf179Ee1494C)
-*** Meter's Warringstakes Testnet:** [0xC76E1C32cE3eed1aBCd24323636378ee85b59643](https://scan-warringstakes.meter.io/address/0xC76E1C32cE3eed1aBCd24323636378ee85b59643)
+* **Meter's Warringstakes Testnet:** [0xC76E1C32cE3eed1aBCd24323636378ee85b59643](https://scan-warringstakes.meter.io/address/0xC76E1C32cE3eed1aBCd24323636378ee85b59643)
 
 
 ## References:
