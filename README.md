@@ -238,7 +238,7 @@ modifier onlyEOA() {
 * 3b.                  Restrict by IP by only letting 1 IP address hit per throttle
 ...
 */
-
+...
 uint256 public throttleUser;                                    //3a. security
 mapping(bytes32 => uint256) public lastPlayedTimestamp;         //3a. security apply throttle by IP address. Store in simple hash table
 
