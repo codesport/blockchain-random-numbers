@@ -229,7 +229,24 @@ modifier onlyEOA() {
 ```
 ### 3. Usage Throttling By IP and Wallet Address
 
-[Usage throttling](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L101) is implemented to  restrict hammering by the same  wallet and IP addresses. Although not bulletproof due to VPNs and the ease of generating multiple wallet address, these measures do make it more challenging for an attacker to exploit the contract.
+[Usage throttling](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L178) is implemented to  restrict hammering by the same  wallet and IP addresses. Although not bulletproof due to VPNs and the ease of generating multiple wallet address, these measures make it more challenging for an attacker to exploit the contract. Below are partial excerpts of the throttling Solidity code:
+
+```javascript
+/*
+...
+* 3a. Usage Throtting: Restrict by wallet and IP addresses by recording last time these addresses interacted with contract. 
+* 3b.                  Restrict by IP by only letting 1 IP address hit per throttle
+...
+*/
+
+uint256 public throttleUser;                                    //3a. security
+mapping(bytes32 => uint256) public lastPlayedTimestamp;         //3a. security apply throttle by IP address. Store in simple hash table
+
+/** 
+* Applying Item 3a. Impose __wallet-based__ 'usage throttling' via a timeout to prevent continous contract calls (cooldown function)
+*/
+require( users[msg.sender].lastPlayedTimestamp +  throttleUser < block.timestamp, "Wallet Filter: Please wait a few minutes to play again");
+```
 
 ### 4. Players May View Their Activity Logs:
 
