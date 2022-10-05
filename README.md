@@ -38,7 +38,7 @@ Blockchains are immutable and deterministic. Hence, producing on-chain randomnes
  
  2.  [Chainlink VRF](https://vrf.chain.link) uses a fully non-deterministic and off-chain VRF which was tested for this POC 
  
- 3. A [naive pseudo-random number generator](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L240-L274) was built and also used in this POC.  It is analyzed in the discussions that follow.
+ 3. A [naive pseudo-random number generator](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L260-L301) was built and also used in this POC.  It is analyzed in the discussions that follow.
 
  The naive generator is demonstrated in this on-chain [Raffle/Lotto](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol) game which pays out winning in the network's native token.
 

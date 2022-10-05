@@ -136,7 +136,7 @@ contract RafflePseudo4 {  //Mumbai:
      *    msg.sender == tx.origin, prevents smart contracts from calling this method by adding a requirement 
      *    that the function caller is the same account that intitiated the tx at t=0. 
      *    This is method on Ethereum that guarantees that the caller is not a smart contract. 
-     *    source 1: https://ethereum.stackexchange.com/a/109682/3506  
+     *    source 1: https://ethereum.stackexchange.com/a/109682/3506
      *    source 2: https://quantstamp.com/blog/proper-treatment-of-randomness-on-evm-compatible-networks
      */
     modifier onlyEOA() {
