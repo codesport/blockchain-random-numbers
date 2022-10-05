@@ -15,7 +15,7 @@ Finally, console logging function outputs and test assertions are critical to ga
 * [Technical Deep Dive: Randomness on Blockchains](#technical-deep-dive-randomness-on-evm-compatible-blockchains)
 * [Technical Details: In-house, Pseudo-Random Number Generator](#technical-details-in-house-pseudo-random-number-generator)
 * [Unit Testing](#unit-testing)
-* [Proactive Contract Exploit Blocking: Off-Chain Auditing, NoEOAs, and Usage Throttling By IP and Wallet Addresses](#proactive-contract-exploit-blocking-off-chain-auditing-noeoas-and-usage-throttling-by-ip-and-wallet-addresses)
+* [Proactive Contract Exploit Blocking: Off-Chain Auditing, onlyEOA, and Usage Throttling By IP and Wallet Addresses](#proactive-contract-exploit-blocking-off-chain-auditing-onlyeoa-and-usage-throttling-by-ip-and-wallet-addresses)
 * [Conclusion, Next Steps, and Contract Deployment](#conclusion-next-steps-and-contract-deployment)
 * [References](#references)
 
@@ -127,7 +127,7 @@ Which *should* the same as:   `jackpotPrizeAmount = address(this).balance  -  ad
 
 
 
-## Proactive Contract Exploit Blocking: Off-Chain Auditing, NoEOAs, and Usage Throttling By IP and Wallet Addresses
+## Proactive Contract Exploit Blocking: Off-Chain Auditing, onlyEOA, and Usage Throttling By IP and Wallet Addresses
 
 This contract was built from the perspective of a would-be attacker hunting for exploits. Hence, the first course of business was permanent tracking of user activity while protecting user privacy. The ensuing lines of code in this section analyze this contract's security tracking schema. 
 
@@ -206,10 +206,27 @@ Lines 443 - 453 show that only admins can access sensitive tracking data.
     } 
 ```
 
-### 2. Blocking Externally Owned Accounts and Contracts (EOAs)
+### 2. Blocking Function Calls from Smart Contracts (onlyEOAs)
 
-[Externally Owned Accounts and Contracts (EOAs)](https://ethereum.stackexchange.com/questions/93082/how-do-eoas-work-and-what-is-their-interaction-with-smart-contracts) are blocked from interacting with the game. The `function modifier` on [lines 124 - 125](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L124) enforces this rule when applied to any public and external functions.
+[Smart contracts](https://ethereum.stackexchange.com/questions/93082/how-do-eoas-work-and-what-is-their-interaction-with-smart-contracts) are blocked from interacting with the game. The `function modifier` on [lines 142 - 145](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L142-L145) enforces this rule when applied to any public and external functions.
 
+```javascript
+/** 
+* 6. require(msg.sender == tx.origin, "Smart contracts cannot call this function");
+*    msg.sender is last account address in a chain of function calls. tx.origin is always the EOA (human)
+*    that initiated the sequence of transactions. Contracts cannot initiate transactions on their own.
+* 
+*    msg.sender == tx.origin, prevents smart contracts from calling this method by adding a requirement 
+*    that the function caller is the same account that intitiated the tx at t=0. 
+*    This is method on Ethereum that guarantees that the caller is not a smart contract. 
+*    source 1: https://ethereum.stackexchange.com/a/109682/3506  
+*    source 2: https://quantstamp.com/blog/proper-treatment-of-randomness-on-evm-compatible-networks
+*/
+modifier onlyEOA() {
+    require(msg.sender == tx.origin, "Smart contracts cannot call this function");
+    _;
+}     
+```
 ### 3. Usage Throttling By IP and Wallet Address
 
 [Usage throttling](https://github.com/codesport/blockchain-random-numbers/blob/master/contracts/RafflePseudo4.sol#L101) is implemented to  restrict hammering by the same  wallet and IP addresses. Although not bulletproof due to VPNs and the ease of generating multiple wallet address, these measures do make it more challenging for an attacker to exploit the contract.

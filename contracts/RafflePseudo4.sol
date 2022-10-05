@@ -99,7 +99,7 @@ contract RafflePseudo4 {  //Mumbai:
     * 2. allows web apps to read the data easily
     * 3. Add the 'indexed' keyword in front of the event data that you want to use to filter the events recorded in the blockchain.
     * 4. Indexed parameters go under topics and the non-indexed parameters go under data
-    * 5. Ma of 3 events can be indexed an an event
+    * 5. Max of 3 events can be indexed an an event
     */
     event WinnerLog(uint256 indexed raffleCounter, address indexed winnerWalletAddress, uint256 indexed timestamp, uint256 winnerUserPayout, uint256 winningNumber  ); 
 
@@ -108,7 +108,7 @@ contract RafflePseudo4 {  //Mumbai:
         require(msg.value > 0, "Contract must be funded at deployment");            // Contract must be funded >= prize amoubnt to be deployable 
 
         modulo = 100;                                                                // 1/100 = 1% win probability 
-        seed = uint256( keccak256( abi.encodePacked( block.timestamp, block.difficulty) ) );                                // Random number must be seeded at deployment
+        seed = uint256( keccak256( abi.encodePacked( block.timestamp, block.difficulty) ) );     // Random number must be seeded at deployment
         jackpotPrizeAmount = msg.value;                                              // Prize amount must be specified at deployment
         owner = payable(msg.sender);                                                 // Define owner as deployer of contract
         throttleUser =  10 minutes;                                                  // User may only make 1 wager every n minutes
@@ -128,7 +128,18 @@ contract RafflePseudo4 {  //Mumbai:
         _;
     }  
 
-    modifier noEOA() {
+    /** 
+     * 6. require(msg.sender == tx.origin, "Smart contracts cannot call this function");
+     *    msg.sender is last account address in a chain of function calls. tx.origin is always the EOA (human)
+     *    that initiated the sequence of transactions. Contracts cannot initiate transactions on their own.
+     * 
+     *    msg.sender == tx.origin, prevents smart contracts from calling this method by adding a requirement 
+     *    that the function caller is the same account that intitiated the tx at t=0. 
+     *    This is method on Ethereum that guarantees that the caller is not a smart contract. 
+     *    source 1: https://ethereum.stackexchange.com/a/109682/3506  
+     *    source 2: https://quantstamp.com/blog/proper-treatment-of-randomness-on-evm-compatible-networks
+     */
+    modifier onlyEOA() {
         require(msg.sender == tx.origin, "Smart contracts cannot call this function");
         _;
     }
@@ -138,7 +149,7 @@ contract RafflePseudo4 {  //Mumbai:
      *
      * PRO-TIP 3:  The value  of address(this).balance in payable methods is increased by msg.value before the body the ayable method executes
      */
-    function userCommit( uint8 guess, bytes32 _IPAddress ) public payable noEOA{ // guess is between 0 to 255
+    function userCommit( uint8 guess, bytes32 _IPAddress ) public payable onlyEOA{ // guess is between 0 to 255
         
         require( jackpotPrizeAmount > 0, "This raffle game is offline. Try again tomorrow" );
         require( msg.value >= minWager, 'Please deposit the minimum amount to play');
@@ -153,14 +164,7 @@ contract RafflePseudo4 {  //Mumbai:
     }
    
 
-    function runRaffle( uint8 guess, bytes32 _IPAddress, bool _didUserCommit ) private noEOA{ //shall only be called when funds are desposited
-
-        /** 
-         * 6. Prevent smart contracts from calling this method by added a requirement that the caller of 
-         *    the enter method does not have any smart contract code associated with its address on on chain
-         *    This is method on Ethereum that guarantees that the caller is not a smart contract
-         */
-        // require(msg.sender == tx.origin, "Smart contracts cannot call this function");
+    function runRaffle( uint8 guess, bytes32 _IPAddress, bool _didUserCommit ) private { //shall only be called when funds are desposited
 
         /** 
          * Applying Item 5. Enforce Commit and reveal pattern
