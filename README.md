@@ -1,6 +1,6 @@
 **Attribution:** This dApp was created by Marcos (Marcus) A. B. His GitHub username is [codesport](https://github.com/codesport)
 
-# Key Takeaway and Lesson Learned: Unit Tests are Your Friend
+# Key Takeaway: Unit Testing is Your Best Friend
 
 The key takeaway from this project is that, at a minimum, thorough unit tests must be performed (and pass) on all functions that handle and compute money.  
 
